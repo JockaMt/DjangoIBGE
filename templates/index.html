@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Início {% endblock %}
+{% block content %}
+<div class="container">
+    <p>Selecione uma opção:</p>
+    <nav>
+        <ul class="button-list">
+            <li class="li-nav"><a class="button" href="{% url 'estados' %}">Estados</a></li>
+            <li class="li-nav"><a class="button" href="{% url 'municipios' %}">Municípios</a></li>
+            <li class="li-nav"><a class="button" href="{% url 'distritos' %}">Distritos</a></li>
+        </ul>
+    </nav>
+    <p>Mais:</p>
+    <nav>
+        <ul class="button-list">
+            <li class="li-nav"><a class="button" href="{% url 'empresas' %}">Empresas</a></li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}

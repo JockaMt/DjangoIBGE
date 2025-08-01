@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <a class="secondary-button" href="/">&lt; Voltar</a>
+    {% if distritos %}
+    <ul>
+        {% for distrito in distritos %}
+            <li class="{% if forloop.counter0|divisibleby:2 %}li-variant{% endif %}">{{ distrito.nome }}</li>
+        {% endfor %}
+    </ul>
+    <nav class="pagination">
+        <a class="button" href="?page=1">1</a>
+        {% if page_number < 2 %}
+            <span class="button disabled">&lt;</span>
+        {% else %}
+            <a class="button" href="?page={{ page_number|add:-1 }}">&lt;</a>
+        {% endif %}
+        <p class="pagination-info">{{ page_number }}</p>
+        {% if page_number >= pages %}
+            <span class="button disabled">&gt;</span>
+        {% else %}
+            <a class="button" href="?page={{ page_number|add:1 }}">&gt;</a>
+        {% endif %}
+        <a class="button" href="?page={{ pages }}">{{ pages }}</a>
+    </nav>
+    {% else %}
+        <form class="load-button" method="post" action="{% url 'distritos' %}">
+            {% csrf_token %}
+            <button type="submit" class="button">Carregar Distritos</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
