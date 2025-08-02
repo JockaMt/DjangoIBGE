@@ -58,19 +58,42 @@ def estados_view(request):
             messages.error(request, f"Erro na importação: {e}")
             return HttpResponse(f"Erro na importação: {e}", status=500)
     else:
-        estados_list = Estado.objects.all().order_by('nome')
-        paginator = Paginator(estados_list, 10)
-
+        # Filtragem
+        estados_list = Estado.objects.select_related('regiao').all()
+        
+        # Filtro por região
+        regiao_filter = request.GET.get('regiao')
+        if regiao_filter:
+            estados_list = estados_list.filter(regiao__nome__icontains=regiao_filter)
+        
+        # Filtro por nome
+        nome_filter = request.GET.get('nome')
+        if nome_filter:
+            estados_list = estados_list.filter(nome__icontains=nome_filter)
+        
+        # Filtro por sigla
+        sigla_filter = request.GET.get('sigla')
+        if sigla_filter:
+            estados_list = estados_list.filter(sigla__icontains=sigla_filter)
+        
+        estados_list = estados_list.order_by('nome')
+        
+        # Paginação
+        paginator = Paginator(estados_list, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         context = {
             'estados': page_obj,
-            'pages': paginator.num_pages,
-            'page_number': page_obj.number,
-            'title': 'Estados'
+            'paginator': paginator,
+            'page_obj': page_obj,
+            'title': 'Estados',
+            'filters': {
+                'regiao': regiao_filter or '',
+                'nome': nome_filter or '',
+                'sigla': sigla_filter or ''
+            }
         }
-        #print(context)
         return render(request, 'estados.html', context)
 
 
@@ -111,17 +134,48 @@ def municipios_view(request):
             messages.error(request, f"Erro na importação: {e}")
             return HttpResponse(f"Erro na importação: {e}", status=500)
     else:
-        municipios_list = Municipio.objects.all().order_by('nome')
-        paginator = Paginator(municipios_list, 10)
-
+        # Filtragem
+        municipios_list = Municipio.objects.select_related(
+            'microrregiao__mesorregiao__uf__regiao',
+            'regiao_imediata__regiao_intermediaria__uf'
+        ).all()
+        
+        # Filtro por nome
+        nome_filter = request.GET.get('nome')
+        if nome_filter:
+            municipios_list = municipios_list.filter(nome__icontains=nome_filter)
+        
+        # Filtro por UF
+        uf_filter = request.GET.get('uf')
+        if uf_filter:
+            municipios_list = municipios_list.filter(
+                microrregiao__mesorregiao__uf__sigla__icontains=uf_filter
+            )
+        
+        # Filtro por região
+        regiao_filter = request.GET.get('regiao')
+        if regiao_filter:
+            municipios_list = municipios_list.filter(
+                microrregiao__mesorregiao__uf__regiao__nome__icontains=regiao_filter
+            )
+        
+        municipios_list = municipios_list.order_by('nome')
+        
+        # Paginação
+        paginator = Paginator(municipios_list, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         context = {
             'municipios': page_obj,
-            'pages': paginator.num_pages,
-            'page_number': page_obj.number,
-            'title': 'Municípios'
+            'paginator': paginator,
+            'page_obj': page_obj,
+            'title': 'Municípios',
+            'filters': {
+                'nome': nome_filter or '',
+                'uf': uf_filter or '',
+                'regiao': regiao_filter or ''
+            }
         }
         return render(request, 'municipios.html', context)
 
@@ -163,16 +217,51 @@ def distritos_view(request):
             messages.error(request, f"Erro na importação: {e}")
             return HttpResponse(f"Erro na importação: {e}", status=500)
     else:
-        distritos_list = Distrito.objects.all().order_by('nome')
-        paginator = Paginator(distritos_list, 10)
-
+        # Filtragem
+        distritos_list = Distrito.objects.select_related(
+            'municipio',
+            'uf',
+            'regiao',
+            'microrregiao__mesorregiao'
+        ).all()
+        
+        # Filtro por nome
+        nome_filter = request.GET.get('nome')
+        if nome_filter:
+            distritos_list = distritos_list.filter(nome__icontains=nome_filter)
+        
+        # Filtro por município
+        municipio_filter = request.GET.get('municipio')
+        if municipio_filter:
+            distritos_list = distritos_list.filter(municipio__nome__icontains=municipio_filter)
+        
+        # Filtro por UF
+        uf_filter = request.GET.get('uf')
+        if uf_filter:
+            distritos_list = distritos_list.filter(uf__sigla__icontains=uf_filter)
+        
+        # Filtro por região
+        regiao_filter = request.GET.get('regiao')
+        if regiao_filter:
+            distritos_list = distritos_list.filter(regiao__nome__icontains=regiao_filter)
+        
+        distritos_list = distritos_list.order_by('nome')
+        
+        # Paginação
+        paginator = Paginator(distritos_list, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         context = {
             'distritos': page_obj,
-            'pages': paginator.num_pages,
-            'page_number': page_obj.number,
-            'title': 'Distritos'
+            'paginator': paginator,
+            'page_obj': page_obj,
+            'title': 'Distritos',
+            'filters': {
+                'nome': nome_filter or '',
+                'municipio': municipio_filter or '',
+                'uf': uf_filter or '',
+                'regiao': regiao_filter or ''
+            }
         }
         return render(request, 'distritos.html', context)

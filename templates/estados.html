@@ -1,34 +1,78 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block content %}
 <div class="container">
     <a class="secondary-button" href="/">&lt; Voltar</a>
-    {% if estados %}
-    <ul>
-        {% for estado in estados %}
-            <li class="{% if forloop.counter0|divisibleby:2 %}li-variant{% endif %}">{{ estado.nome }}</li>
-        {% endfor %}
-    </ul>
-    <nav class="pagination">
-        <a class="button" href="?page=1">1</a>
-        {% if page_number < 2 %}
-            <span class="button disabled">&lt;</span>
-        {% else %}
-            <a class="button" href="?page={{ page_number|add:-1 }}">&lt;</a>
-        {% endif %}
-        <p class="pagination-info">{{ page_number }}</p>
-        {% if page_number >= pages %}
-            <span class="button disabled">&gt;</span>
-        {% else %}
-            <a class="button" href="?page={{ page_number|add:1 }}">&gt;</a>
-        {% endif %}
-        <a class="button" href="?page={{ pages }}">{{ pages }}</a>
-    </nav>
-    {% else %}
-        <form class="load-button" method="post" action="{% url 'estados' %}">
+
+    <!-- Botão de Importação -->
+    {% if not estados and not filters.nome and not filters.sigla and not filters.regiao %}
+    <div class="import-section">
+        <form method="POST" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="button">Carregar Estados</button>
+            <button type="submit" class="button">Importar Estados</button>
         </form>
+    </div>
+
+    {% else %}
+    
+    <!-- Filtros -->
+    <div class="filters">
+        <h3>Filtros</h3>
+        <form method="GET" class="filter-form">
+            <input type="text" name="nome" placeholder="Nome do estado" value="{{ filters.nome }}">
+            <input type="text" name="sigla" placeholder="Sigla (ex: SP)" value="{{ filters.sigla }}">
+            <input type="text" name="regiao" placeholder="Região" value="{{ filters.regiao }}">
+            <button type="submit" class="button">Filtrar</button>
+            <a href="{% url 'estados' %}" class="button">Limpar</a>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Tabela de Estados -->
+    {% if estados %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Sigla</th>
+                    <th>Região</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for estado in estados %}
+                <tr>
+                    <td>{{ estado.id }}</td>
+                    <td>{{ estado.nome }}</td>
+                    <td>{{ estado.sigla }}</td>
+                    <td>{{ estado.regiao.nome|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    <nav class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.sigla %}&sigla={{ request.GET.sigla }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}"
+            class="button">Primeira</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.sigla %}&sigla={{ request.GET.sigla }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}"
+            class="button">&lt; Anterior</a>
+        {% endif %}
+
+        <span class="pagination-info">
+            Página {{ page_obj.number }} de {{ paginator.num_pages }}
+            ({{ paginator.count }} registros)
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.sigla %}&sigla={{ request.GET.sigla }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}"
+            class="button">Próxima &gt;</a>
+        <a href="?page={{ paginator.num_pages }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.sigla %}&sigla={{ request.GET.sigla }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}"
+            class="button">Última</a>
+        {% endif %}
+    </nav>
     {% endif %}
 </div>
 {% endblock %}
