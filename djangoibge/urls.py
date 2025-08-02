@@ -18,9 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from ibge import views as ibge_views
 from empresas import views as empresas_views
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
+    path("__reload__/", include("django_browser_reload.urls")),
     path('', ibge_views.home, name='home'),
     path('estados/', ibge_views.estados_view, name='estados'),
     path('municipios/', ibge_views.municipios_view, name='municipios'),

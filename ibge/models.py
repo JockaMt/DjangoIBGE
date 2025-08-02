@@ -202,12 +202,12 @@ class Distrito(models.Model):
     id = models.BigIntegerField(primary_key=True, unique=True)
     nome = models.TextField(max_length=50)
     municipio = models.ForeignKey(Municipio, on_delete=models.CASCADE)
-    microrregiao = models.ForeignKey(Microrregiao, on_delete=models.CASCADE)
-    mesorregiao = models.ForeignKey(Mesorregiao, on_delete=models.CASCADE)
-    uf = models.ForeignKey(Uf, on_delete=models.CASCADE)
-    regiao = models.ForeignKey(Regiao, on_delete=models.CASCADE)
-    regiao_imediata = models.ForeignKey(RegiaoImediata, on_delete=models.CASCADE)
-    regiao_intermediaria = models.ForeignKey(RegiaoIntermediaria, on_delete=models.CASCADE)
+    microrregiao = models.ForeignKey(Microrregiao, on_delete=models.CASCADE, null=True, blank=True)
+    mesorregiao = models.ForeignKey(Mesorregiao, on_delete=models.CASCADE, null=True, blank=True)
+    uf = models.ForeignKey(Uf, on_delete=models.CASCADE, null=True, blank=True)
+    regiao = models.ForeignKey(Regiao, on_delete=models.CASCADE, null=True, blank=True)
+    regiao_imediata = models.ForeignKey(RegiaoImediata, on_delete=models.CASCADE, null=True, blank=True)
+    regiao_intermediaria = models.ForeignKey(RegiaoIntermediaria, on_delete=models.CASCADE, null=True, blank=True)
     
     class Meta:
         verbose_name = "Distrito"

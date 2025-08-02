@@ -18,6 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 EXTERNAL_API_URL = config('API_URL')
+ARCHIVE_URL = config('ARCHIVE_URL')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -33,11 +34,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'ibge',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ibge.apps.IbgeConfig',
+    'empresas.apps.EmpresasConfig',
+    'django_browser_reload',
 ]
 
 MIDDLEWARE = [

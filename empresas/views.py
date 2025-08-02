@@ -1,9 +1,13 @@
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
+from .services import EmpresasService
 
 # Create your views here.
 def empresas_view(request):
     """View para exibir a página de empresas"""
+    # empresas = EmpresasService()
+    # empresas.get_data()
+    
     context = {
         'title': 'Empresas',
     }
-    return redirect('home')  # Redireciona para a página inicial ou outra view conforme necessário
+    return render(request, 'empresas.html', context)  # Redireciona para a página inicial ou outra view conforme necessário

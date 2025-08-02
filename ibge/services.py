@@ -1,11 +1,12 @@
 import logging
 import requests
-from typing import Dict, List, Optional
+import time
+from typing import Dict, List
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.conf import settings
-from .models import Regiao, Estado, Municipio, Microrregiao, Mesorregiao, RegiaoImediata, RegiaoIntermediaria, Uf, Distrito
+from .models import *
 
 
 logger = logging.getLogger(__name__)
@@ -150,6 +151,40 @@ class DataValidationService:
                             'uf_id': uf_data['id']
                         }
                         hierarchy['regiao_imediata']['regiao_intermediaria_id'] = ri_data['id']
+            
+            elif municipio_data.get('regiao-imediata'):
+                rim_data = municipio_data['regiao-imediata']
+                hierarchy['regiao_imediata'] = {
+                    'id': rim_data['id'],
+                    'nome': rim_data['nome'],
+                    'regiao_intermediaria_id': None
+                }
+                
+                if rim_data.get('regiao-intermediaria'):
+                    ri_data = rim_data['regiao-intermediaria']
+                    hierarchy['regiao_intermediaria'] = {
+                        'id': ri_data['id'],
+                        'nome': ri_data['nome'],
+                        'uf_id': ri_data.get('UF', {}).get('id') if ri_data.get('UF') else None
+                    }
+                    hierarchy['regiao_imediata']['regiao_intermediaria_id'] = ri_data['id']
+                    
+                    if ri_data.get('UF'):
+                        uf_data = ri_data['UF']
+                        hierarchy['uf'] = {
+                            'id': uf_data['id'],
+                            'sigla': uf_data['sigla'],
+                            'nome': uf_data['nome'],
+                            'regiao_id': uf_data.get('regiao', {}).get('id') if uf_data.get('regiao') else None
+                        }
+                        
+                        if uf_data.get('regiao'):
+                            regiao_data = uf_data['regiao']
+                            hierarchy['regiao'] = {
+                                'id': regiao_data['id'],
+                                'sigla': regiao_data['sigla'],
+                                'nome': regiao_data['nome']
+                            }
                 
         except (KeyError, TypeError) as e:
             logger.warning(f"Erro ao extrair hierarquia: {e}")
@@ -360,8 +395,13 @@ class MunicipioImportService:
             hierarchy = item['hierarchy']
             
             if municipio['id'] not in existing_ids:
-                microrregiao_id = hierarchy['microrregiao']['id'] if hierarchy['microrregiao'] else None
-                regiao_imediata_id = hierarchy['regiao_imediata']['id'] if hierarchy['regiao_imediata'] else None
+                microrregiao_id = None
+                if hierarchy.get('microrregiao') and hierarchy['microrregiao']:
+                    microrregiao_id = hierarchy['microrregiao']['id']
+                
+                regiao_imediata_id = None
+                if hierarchy.get('regiao_imediata') and hierarchy['regiao_imediata']:
+                    regiao_imediata_id = hierarchy['regiao_imediata']['id']
                 
                 municipios_to_create.append(Municipio(
                     id=municipio['id'],
@@ -382,11 +422,12 @@ class DistritoImportService:
     def __init__(self):
         self.api_service = IBGEAPIService()
         self.validation_service = DataValidationService()
-        self.batch_size = 500
+        self.batch_size = 1000 # 500 => 2.25s // 1000 => 2.02s // 1500 => 1.75s // 10000 => 1.39s mas usa mais processador
     
     def import_distritos(self) -> Dict:
         """Importa distritos da API para o banco"""
         try:
+            start_time = time.time()
             municipios_map = self._load_municipios_map()
             raw_data = self.api_service.get_distritos()
             existing_distritos = set(Distrito.objects.values_list('id', flat=True))
@@ -403,15 +444,15 @@ class DistritoImportService:
                     municipio_id = distrito_data['municipio']['id']
                     municipio_obj = municipios_map.get(municipio_id)
                     
-                    if municipio_obj and municipio_obj.microrregiao:
+                    if municipio_obj:
                         distritos_to_create.append(Distrito(
                             id=distrito['id'],
                             nome=distrito['nome'],
                             municipio=municipio_obj,
                             microrregiao=municipio_obj.microrregiao,
-                            mesorregiao=municipio_obj.microrregiao.mesorregiao,
-                            uf=municipio_obj.microrregiao.mesorregiao.uf,
-                            regiao=municipio_obj.microrregiao.mesorregiao.uf.regiao,
+                            mesorregiao=municipio_obj.microrregiao.mesorregiao if municipio_obj.microrregiao else None,
+                            uf=municipio_obj.microrregiao.mesorregiao.uf if municipio_obj.microrregiao and municipio_obj.microrregiao.mesorregiao else None,
+                            regiao=municipio_obj.microrregiao.mesorregiao.uf.regiao if municipio_obj.microrregiao and municipio_obj.microrregiao.mesorregiao and municipio_obj.microrregiao.mesorregiao.uf else None,
                             regiao_imediata=municipio_obj.regiao_imediata,
                             regiao_intermediaria=municipio_obj.regiao_imediata.regiao_intermediaria if municipio_obj.regiao_imediata else None
                         ))
@@ -431,6 +472,8 @@ class DistritoImportService:
             
             logger.info(f"Importação de distritos concluída: {created_count} criados")
             
+            end_time = time.time()
+            print(f"Carregou {len(raw_data)} distritos em {end_time - start_time:.2f} segundos")
             return {
                 'success': True,
                 'total_processed': len(raw_data),
