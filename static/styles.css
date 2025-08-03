@@ -142,9 +142,17 @@ a {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
-    min-width: 150px;
+    min-width: 80px;
     flex: 1;
-    flex-basis: auto;
+}
+
+select {
+    display: flex;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    flex-basis: 100px;
 }
 
 .filter-form input:focus {
@@ -208,6 +216,12 @@ a {
     gap: 10px;
     flex-wrap: wrap;
     padding: 20px 0;
+}
+
+.page-numbers {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .pagination-info {

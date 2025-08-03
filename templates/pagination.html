@@ -1,0 +1,27 @@
+{% block pagination %}
+<!-- Paginação -->
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.uf %}&uf={{ request.GET.uf }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}" class="button">Primeira</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.uf %}&uf={{ request.GET.uf }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}" class="button">&lt; Anterior</a>
+    {% endif %}
+
+    <!-- Números de página próximos -->
+    <div class="page-numbers">
+        {% for i in page_obj.paginator.page_range %}
+            {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+                {% if i == page_obj.number %}
+                    <span class="current-page"><strong>{{ i }} de {{ paginator.num_pages }}</strong></span>
+                {% else %}
+                    <a href="?page={{ i }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.uf %}&uf={{ request.GET.uf }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}" class="button">{{ i }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.uf %}&uf={{ request.GET.uf }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}" class="button">Próxima &gt;</a>
+        <a href="?page={{ paginator.num_pages }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.uf %}&uf={{ request.GET.uf }}{% endif %}{% if request.GET.regiao %}&regiao={{ request.GET.regiao }}{% endif %}" class="button">Última</a>
+    {% endif %}
+</nav>
+{% endblock %}

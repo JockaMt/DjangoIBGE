@@ -9,6 +9,8 @@ from ibge.models import Estado, Municipio, Distrito
 
 
 logger = logging.getLogger(__name__)
+siglas = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
+regioes = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"]
 
 
 def home(request):
@@ -92,7 +94,10 @@ def estados_view(request):
                 'regiao': regiao_filter or '',
                 'nome': nome_filter or '',
                 'sigla': sigla_filter or ''
-            }
+            },
+            'siglas': siglas,
+            'regioes': regioes,
+
         }
         return render(request, 'estados.html', context)
 
@@ -175,7 +180,10 @@ def municipios_view(request):
                 'nome': nome_filter or '',
                 'uf': uf_filter or '',
                 'regiao': regiao_filter or ''
-            }
+            },
+            'siglas': siglas,
+            'regioes': regioes,
+
         }
         return render(request, 'municipios.html', context)
 
@@ -261,7 +269,9 @@ def distritos_view(request):
                 'nome': nome_filter or '',
                 'municipio': municipio_filter or '',
                 'uf': uf_filter or '',
-                'regiao': regiao_filter or ''
-            }
+                'regiao': regiao_filter or '',
+            },
+            'siglas': siglas,
+            'regioes': regioes,
         }
         return render(request, 'distritos.html', context)
