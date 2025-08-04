@@ -75,3 +75,4 @@ cython_debug/
 arquivo.zip
 test.py
 static/empresas_teste.csv
+.empresas_data.zip

@@ -1,12 +1,53 @@
 {% include 'base.html' %}
+{% block backbutton %}
+    <a class="secondary-button" href="/">&lt; Voltar</a>
+{% endblock %}
 {% block content %}
 <div class='container'>
+    
+    <!-- Filtros de Busca -->
+    <form method="get" class="filter-form">
+        <input type="text" name="rasao_social" placeholder="Razão Social" value="{{ filters.rasao_social }}">
+        <input type="text" name="cnpj_basico" placeholder="CNPJ Básico" value="{{ filters.cnpj_basico }}">
+        <input type="text" name="porte" placeholder="Porte" value="{{ filters.porte }}">
+        <button class="button" type="submit">Filtrar</button>
+        <a href="{% url 'empresas' %}" class="button">Limpar</a>
+    </form>
+
     {% if empresas %}
-    <div>aaa</div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead class="fixed-thead">
+                <tr>
+                    <th>CNPJ básico</th>
+                    <th>Razão social</th>
+                    <th>Natureza jurídica</th>
+                    <th>Crassificação do responsável</th>
+                    <th>Capital social</th>
+                    <th>Porte</th>
+                    <th>Ente federativo responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empresa in empresas %}
+                <tr>
+                    <td>{{ empresa.cnpj_basico }}</td>
+                    <td>{{ empresa.rasao_social }}</td>
+                    <td>{{ empresa.natureza_juridica|default:"-" }}</td>
+                    <td>{{ empresa.clasificacao_do_responsavel|default:"-" }}</td>
+                    <td>{{ empresa.capital_social|default:"-" }}</td>
+                    <td>{{ empresa.porte|default:"-" }}</td>
+                    <td>{{ empresa.ente_federativo_responsavel|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'pagination.html' %}
     {% else %}
-    <form class='container'>
+    <form method="post" action="/empresas/" class='container'>
         {% csrf_token %}
-        <button class="button" href="#">Carregar empresas</button>
+        <button class="button" type="submit">Carregar empresas</button>
     </form>
     {% endif %}
 </div>

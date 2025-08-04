@@ -40,8 +40,8 @@ header {
 .button-list {
     display: flex;
     flex-direction: row;
+    gap: 5px;
     justify-content: space-between;
-    gap: 10px;
 }
 
 .li-nav {
@@ -56,17 +56,6 @@ header {
     width: 100%;
     justify-content: center;
     text-decoration: none;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-.pagination-info {
-    align-self: center;
-    padding: 10px;
 }
 
 .button {
@@ -92,8 +81,14 @@ a {
 
 .secondary-button {
     width: 100px;
+    position: fixed;
     color: #303030;
     padding: 10px 20px;
+    margin: 9px;
+    color: white;
+    font-weight: bold;
+    top: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     border: none;
     cursor: pointer;
     text-decoration: none;
@@ -171,6 +166,14 @@ select {
     scrollbar-width: thin;
     scrollbar-color: #70707046 transparent;
     min-height: 10rem;
+    max-height: 60vh; /* Altura máxima para permitir scroll */
+    overflow-y: auto; /* Scroll vertical quando necessário */
+}
+
+.fixed-thead {
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Garante que fica por cima do conteúdo */
 }
 
 /* Estilos da tabela */
@@ -213,15 +216,15 @@ select {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 5px;
     padding: 20px 0;
+    flex-wrap: nowrap;
 }
 
 .page-numbers {
     display: flex;
+    gap: 5px;
     flex-direction: row;
-    gap: 1rem;
 }
 
 .pagination-info {
@@ -262,7 +265,7 @@ select {
     }
     
     .pagination {
-        gap: 5px;
+        gap: 5px
     }
     
     .button {

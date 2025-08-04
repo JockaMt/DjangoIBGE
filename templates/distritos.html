@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
+{% block backbutton %}
+    <a class="secondary-button" href="/">&lt; Voltar</a>
+{% endblock %}
 {% block content %}
 <div class="container">
-    <a class="secondary-button" href="/">&lt; Voltar</a>
     
     <!-- Botão de Importação -->
     {% if not distritos and not filters.nome and not filters.sigla and not filters.regiao %}}
