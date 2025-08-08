@@ -15,8 +15,25 @@
     <header>
       {% block backbutton %}
       {% endblock %}
-      <h1>{{ title }}</h1>
+      <div class="header-content">
+        <h1>{{ title }}</h1>
+        {% if user.is_authenticated %}
+          <div class="user-info">
+            <a href="{% url 'logout' %}" class="logout">Sair</a>
+          </div>
+        {% endif %}
+      </div>
     </header>
+    
+    <!-- Mensagens do Django -->
+    {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
   </body>

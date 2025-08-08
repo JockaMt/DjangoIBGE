@@ -16,12 +16,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from ibge import views as ibge_views
 from empresas import views as empresas_views
+from custom_auth import views as auth_views_custom
 from django.urls import path, include
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
+    path('login/', auth_views_custom.login, name='login'),
+    path('logout/', auth_views_custom.logout, name='logout'),
+    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
     path('', ibge_views.home, name='home'),
     path('estados/', ibge_views.estados_view, name='estados'),
     path('municipios/', ibge_views.municipios_view, name='municipios'),

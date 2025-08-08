@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .services import MunicipioImportService, DistritoImportService, EstadoImportService
 import logging
@@ -21,6 +22,7 @@ def home(request):
     return render(request, 'index.html', context)
 
 
+@login_required
 def estados_view(request):
     """View para importação de estados"""
     
@@ -102,6 +104,7 @@ def estados_view(request):
         return render(request, 'estados.html', context)
 
 
+@login_required
 def municipios_view(request):
     """View para importação de municípios"""
     if request.method == 'POST':
@@ -188,6 +191,7 @@ def municipios_view(request):
         return render(request, 'municipios.html', context)
 
 
+@login_required
 def distritos_view(request):
     """View para importação de distritos"""
     if request.method == 'POST':
